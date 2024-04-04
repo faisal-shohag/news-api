@@ -1,0 +1,106 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News API</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            font-family: "Urbanist", sans-serif;
+            max-width: 1280px;
+            margin: 0 auto;
+            background-color: #F3F4F6;
+        }
+        code{
+            padding: 5px 14px !important;
+        }
+    </style>
+</head>
+<body class="lg:px-16 px-2">
+    <div class="mt-2 bg-white w-full p-3 rounded-xl">
+        <div class="flex flex-col">
+            <div class="text-xl font-black">News API</div>
+            <div class="text-sm text-gray-400">by Faisal Shohag</div>
+        </div>
+    </div>
+
+    <div class="mt-2 bg-white w-full p-3 rounded-xl">
+        <img class="h-5 mb-2" src="./images/bbc.svg"/>
+        <hr/>
+        <div class="mt-3">
+            <div class="font-bold">All News</div>
+            <div class="mt-2 lg:flex lg:items-center gap-3">
+                <div class="font-mono bg-gray-100 px-2 rounded-lg py-1">
+                    https://newsapi-by-faisal.vercel.app/bbc/bangla
+                </div> <a class="font-bold underline text-red-600" target="_blank" href="https://newsapi-by-faisal.vercel.app/bbc/bangla">Go</a>
+            </div>
+
+            <div class="font-bold mt-5">News by Category</div>
+            <div class="ml-5 mt-2">
+                <div class="flex items-center gap-1">
+                    <div class="h-2 w-2 bg-red-500 rounded-full"></div>
+                    <div class="text-sm font-medium">bangladesh</div>
+                </div>
+                <div class="flex items-center gap-1">
+                    <div class="h-2 w-2 bg-green-500 rounded-full"></div>
+                    <div class="text-sm font-medium">politics</div>
+                </div>
+
+                <div class="flex items-center gap-1">
+                    <div class="h-2 w-2 bg-pink-500 rounded-full"></div>
+                    <div class="text-sm font-medium">world</div>
+                </div>
+
+                <div class="flex items-center gap-1">
+                    <div class="h-2 w-2 bg-indigo-500 rounded-full"></div>
+                    <div class="text-sm font-medium">health</div>
+                </div>
+
+                <div class="flex items-center gap-1">
+                    <div class="h-2 w-2 bg-blue-500 rounded-full"></div>
+                    <div class="text-sm font-medium">economics</div>
+                </div>
+
+                <div class="flex items-center gap-1">
+                    <div class="h-2 w-2 bg-orange-500 rounded-full"></div>
+                    <div class="text-sm font-medium">sports</div>
+                </div>
+
+                <div class="flex items-center gap-1">
+                    <div class="h-2 w-2 bg-purple-500 rounded-full"></div>
+                    <div class="text-sm font-medium">technology</div>
+                </div>
+            </div>
+            <div class="mt-2 lg:flex lg:items-center gap-3">
+                <div class="font-mono bg-gray-100 px-2 rounded-lg py-1">
+                    https://newsapi-by-faisal.vercel.app/bbc/bangla/{category}
+                </div> <a class="font-bold underline text-red-600" target="_blank" href="https://newsapi-by-faisal.vercel.app/bbc/bangla/bangladesh">Go</a>
+            </div>
+               
+               
+            
+            
+        </div>
+    </div>
+
+    <div class="mt-2 bg-white w-full p-3 rounded-xl flex justify-center items-center gap-5">
+        <div>
+           <a target="_blank" href="https://github.com/faisal-shohag/news-api"> <img class="h-8 w-8" src="https://cdn-icons-png.flaticon.com/512/2175/2175377.png"></a>
+        </div>
+        <div>
+            <a target="_blank" href="https://www.linkedin.com/in/faisal-shohag/"> <img class="h-8 w-8" src="https://cdn-icons-png.flaticon.com/512/145/145807.png"></a>
+         </div>
+
+         <div>
+            <a target="_blank" href="https://www.facebook.com/faisal.shohag.18/"> <img class="h-8 w-8" src="https://cdn-icons-png.flaticon.com/512/15047/15047435.png"></a>
+         </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
+</body>
+</html>

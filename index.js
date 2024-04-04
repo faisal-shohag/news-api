@@ -1,15 +1,17 @@
 const express = require('express')
 const news = require('./news')
 const app = express()
-
+const path = require('path');
 const PORT = 3000
+app.use(express.static('public'))
 
 app.get('/', (req, res) => {
-    res.send({"status": "success"})
+    res.sendFile(path.join(__dirname+'/index.html'));
 })
 
-app.get('/bbc/bangla/:id', news.bbcBangla)
-app.get('/bbc/bangla', news.bbc_all)
+app.get('/bbc/bangla/:id', news.bbcBanglaCategory)
+app.get('/bbc/bangla', news.bbcBanglaAll)
+app.get('/bbc/english', news.bbcEnglishAll)
 
 app.listen(PORT, () => {
     console.log(`App is running on PORT ${PORT}!`)
