@@ -32,7 +32,7 @@ axios.get(URL + bbcBn[category])
             newsData.push({image, title, link})
         }
     }
-    res.send({author: "Faisal Shohag", data: newsData})
+    res.send({madewithloveby: "Faisal Shohag", data: newsData})
 })
 .catch(err=> {
     res.send({err})
