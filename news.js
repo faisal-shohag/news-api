@@ -80,25 +80,31 @@ exports.bbcEnglishAll = (req, res) => {
     axios.get(URL2)
 .then(response => {
     const data = response.data
-    let dataArr = data.split('"curations":')[1]
-    let all_news = dataArr.split('}]}}]')[0].replace(/{width}/g, "660")
-    all_news = JSON.parse(all_news+'}]}}]')
+    let dataArr = data.split('type="application/json">')[1]
+    let all_news = dataArr.split('</script></body></html>')[0]
+    all_news = JSON.parse(all_news)
     
+    let sec = all_news.props.pageProps.page["@\"home\","].sections
     let news_data = {
-        "main": all_news[0].summaries,
-        "selected": all_news[1].summaries,
-        "bangladesh": all_news[2].summaries,
-        "india": all_news[3].summaries,
-        "world": all_news[4].summaries,
-        "health": all_news[5].summaries,
-        "video": all_news[6].summaries,
-        "others": all_news[7].summaries,
-        "most_read": all_news[8].mostRead.items
+        "main": sec[0].content,
+        "news_video": sec[5].content,
+        "editors_picks": sec[11].content,
+        "science_health_video": sec[18].content,
+        "world_of_wonder": sec[23].content,
+        "world_of_wonder": sec[26].content,
+        "business": sec[29].content,
+        "culture": sec[30].content,
+        "sport": sec[31].content,
+        "climate_solutions": sec[33].content,
+        "technology": sec[34].content,
+        "science_health": sec[35].content,
+        "worlds_table": sec[36].content,
+        "travel": sec[37].content,
 
     }
 
-    res.send({madewithloveby: "Faisal Shohag", data:news_data})
-    res.send()
+    res.send({madewithloveby: "Faisal Shohag", data: news_data})
+    // res.send()
 })
 .catch(err=> {
     res.send({err})
