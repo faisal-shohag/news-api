@@ -203,6 +203,4 @@ curl http://localhost:3000/api/news
 ## Contributing
 Feel free to submit issues or pull requests to improve the project!
 
-## License
-MIT License - see [LICENSE](LICENSE) for details.
 
