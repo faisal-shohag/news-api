@@ -3,7 +3,59 @@ const {Router }= require('express')
 const axios = require('axios');
 
 const router = Router()
+
+router.get('/api/categories', async(req, res) => {
+    try {
+        const url = 'https://www.bbc.com/bengali';
+        const response = await axios.get(url, {
+            timeout: 10000,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (compatible; NewsCrawler/1.0)'
+            }
+        });
+
+        const html = response.data;
+        const $ = cheerio.load(html);
+        const categories = []
+        const excludes = ['bengali', 'read', 'ভিডিও', 'cxy7jg418e7t']
+
+        $('header nav div[data-e2e="dropdown-nav"] ul li a').each((index, element) => {
+             const title = $(element).text().trim()
+             let link = $(element).attr('href');
+             let id = link.split('/')
+             id = id[id.length-1]
+             if(!excludes.includes(id)) {
+                categories.push({id, title})
+             }
+        })
+
+        
+        $('section h2 a').each((index, element) => {
+            const title = $(element).text().trim()
+            let link = $(element).attr('href');
+            let id = link.split('/')
+            id = id[id.length-1]
+            if(!excludes.includes(id)) {
+               categories.push({id, title})
+            }
+       })
+
+        res.status(200).json({
+            success: true,
+            count: categories.length,
+            categories
+        });
+    } catch (error) {
+        console.error('Error fetching popular news:', error.message);
+        res.status(500).json({
+            success: false,
+            error: error.message || 'Failed to fetch news categories.'
+        });
+    }
+})
+
 router.get('/api/news', async (req, res) => {
+    // console.log("news")
     try {
         const url = 'https://www.bbc.com/bengali';
         const response = await axios.get(url, {
@@ -18,7 +70,7 @@ router.get('/api/news', async (req, res) => {
         const newsArticles = [];
 
         // Target the specific container and list items
-        $('div[data-testid="hierarchical-grid"] ul[data-testid="topic-promos"] li').each((index, element) => {
+        $('main ul li').each((index, element) => {
             const titleElement = $(element).find('h3 a');
             const title = titleElement.text().trim();
             let link = titleElement.attr('href');
@@ -31,9 +83,32 @@ router.get('/api/news', async (req, res) => {
             const timestamp = $(element).find('time.promo-timestamp').text().trim();
             
             // Get image URL from the largest available size
-            const imageUrl = $(element).find('img').attr('src') || 
-                           $(element).find('source[type="image/webp"]').first().attr('srcset')?.split(' ')[0];
-            
+             // Extract image information
+             const imgElement = $(element).find('source');
+             const imgElement2 = $(element).find('img');
+             const imgSrc = imgElement2.attr('src');
+             const imgSrcset = imgElement.attr('srcset');
+             const imgAlt = imgElement2.attr('alt');
+             
+             // Parse srcset into array of objects with resolution and URL
+             let srcset = [];
+             if (imgSrcset) {
+                 srcset = imgSrcset.split(', ').map(item => {
+                     const [url, resolution] = item.split(' ');
+                     return {
+                         resolution,
+                         url
+                     };
+                 });
+             }
+             
+             // Add base image to srcset if it exists
+             if (imgSrc) {
+                 srcset.unshift({
+                     resolution: 'base',
+                     url: imgSrc
+                 });
+             }
 
             if (title) {
                 newsArticles.push({
@@ -42,7 +117,10 @@ router.get('/api/news', async (req, res) => {
                     link,
                     description: description || 'No description available',
                     timestamp,
-                    imageUrl: imageUrl || 'No image available',
+                    image: {
+                        alt: imgAlt,
+                        srcset: srcset
+                    },
                     scrapedAt: new Date().toISOString()
                 });
             }
@@ -66,6 +144,94 @@ router.get('/api/news', async (req, res) => {
         res.status(500).json({
             success: false,
             error: error.message || 'Failed to fetch news articles'
+        });
+    }
+});
+
+router.get('/api/categories/:id', async (req, res) => {
+    const categoryId = req.params.id;
+    const url = `https://www.bbc.com/bengali/topics/${categoryId}`;
+
+    try {
+        const response = await axios.get(url, {
+            timeout: 10000,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (compatible; NewsCrawler/1.0)'
+            }
+        });
+
+        const html = response.data;
+        const $ = cheerio.load(html);
+
+        // Find the curation grid container
+        const gridContainer = $('div[data-testid="curation-grid-normal"]');
+        
+        // Initialize array to store extracted items
+        const articles = [];
+
+        // Iterate through each list item in the grid
+        gridContainer.find('li.bbc-t44f9r').each((index, element) => {
+            const article = $(element);
+            
+            // Extract title and link
+            const titleElement = article.find('h2 a');
+            const title = titleElement.text().trim();
+            const link = titleElement.attr('href');
+            
+            // Extract time
+            const time = article.find('time.promo-timestamp').text().trim();
+            const datetime = article.find('time.promo-timestamp').attr('datetime');
+            
+            // Extract image information
+            const imgElement = article.find('img');
+            const imgSrc = imgElement.attr('src');
+            const imgSrcset = imgElement.attr('srcset');
+            const imgAlt = imgElement.attr('alt');
+            
+            // Parse srcset into array of objects with resolution and URL
+            let srcset = [];
+            if (imgSrcset) {
+                srcset = imgSrcset.split(', ').map(item => {
+                    const [url, resolution] = item.split(' ');
+                    return {
+                        resolution,
+                        url
+                    };
+                });
+            }
+            
+            // Add base image to srcset if it exists
+            if (imgSrc) {
+                srcset.unshift({
+                    resolution: 'base',
+                    url: imgSrc
+                });
+            }
+            
+            // Push extracted data to articles array
+            articles.push({
+                title,
+                link,
+                time,
+                datetime,
+                image: {
+                    alt: imgAlt,
+                    srcset: srcset
+                }
+            });
+        });
+
+        res.json({
+            success: true,
+            count: articles.length,
+            articles
+        });
+
+    } catch (error) {
+        console.error('Error fetching article:', error.message);
+        res.status(error.response?.status === 404 ? 404 : 500).json({
+            success: false,
+            error: error.message || 'Failed to fetch article'
         });
     }
 });
@@ -142,6 +308,7 @@ router.get('/api/news/:id', async (req, res) => {
         });
     }
 });
+
 router.get('/api/popular', async (req, res) => {
     try {
         const url = 'https://www.bbc.com/bengali/popular/read';
