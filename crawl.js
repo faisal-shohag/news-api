@@ -18,12 +18,13 @@ router.get('/api/categories', async(req, res) => {
         const $ = cheerio.load(html);
         const categories = []
         const excludes = ['bengali', 'read', 'ভিডিও', 'cxy7jg418e7t']
-
+        const ids = []
         $('header nav div[data-e2e="dropdown-nav"] ul li a').each((index, element) => {
              const title = $(element).text().trim()
              let link = $(element).attr('href');
              let id = link.split('/')
              id = id[id.length-1]
+             ids.push(id)
              if(!excludes.includes(id)) {
                 categories.push({id, title})
              }
@@ -35,7 +36,7 @@ router.get('/api/categories', async(req, res) => {
             let link = $(element).attr('href');
             let id = link.split('/')
             id = id[id.length-1]
-            if(!excludes.includes(id)) {
+            if(!ids.includes(id)) {
                categories.push({id, title})
             }
        })
