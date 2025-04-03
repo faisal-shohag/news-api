@@ -5,6 +5,7 @@ const path = require('path');
 const cors = require('cors');
 const PORT = 3000
 app.use(express.static('public'))
+const crawl = require('./crawl')
 
 app.use(cors())
 
@@ -15,7 +16,7 @@ app.get('/', (req, res) => {
 app.get('/bbc/bangla/:id', news.bbcBanglaCategory)
 app.get('/bbc/bangla', news.bbcBanglaAll)
 app.get('/bbc/english', news.bbcEnglishAll)
-
+app.use(crawl)
 app.listen(PORT, () => {
     console.log(`App is running on PORT ${PORT}!`)
 })
