@@ -178,6 +178,8 @@ router.get('/api/categories/:id', async (req, res) => {
             const titleElement = article.find('h2 a');
             const title = titleElement.text().trim();
             const link = titleElement.attr('href');
+            let id = link.split('/')
+            id = id[id.length-1]
             
             // Extract time
             const time = article.find('time.promo-timestamp').text().trim();
@@ -211,6 +213,7 @@ router.get('/api/categories/:id', async (req, res) => {
             
             // Push extracted data to articles array
             articles.push({
+                id,
                 title,
                 link,
                 time,
