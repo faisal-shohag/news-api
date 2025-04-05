@@ -13,7 +13,7 @@ app.use(cors());
 
 const globalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 mins
-    max: 100, 
+    max: 300, 
     message: {
         success: false,
         error: 'Too many requests from this IP, please try again after 15 minutes.'
