@@ -43,7 +43,7 @@ bbc-bengali-scraper/
 `http://localhost:3000/api`
 
 ### Rate Limits
-- **Global**: 100 requests per 15 minutes per IP.
+- **Global**: 300 requests per 15 minutes per IP.
 - **API-specific**: 15 requests per minute per IP.
 - Exceeding limits returns a `429 Too Many Requests` response with:
   ```json
