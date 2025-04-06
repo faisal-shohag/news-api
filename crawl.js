@@ -4,59 +4,7 @@ const axios = require('axios');
 
 const router = Router()
 
-router.get('/api/categories', async(req, res) => {
-    try {
-        const url = 'https://www.bbc.com/bengali';
-        const response = await axios.get(url, {
-            timeout: 10000,
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (compatible; NewsCrawler/1.0)'
-            }
-        });
-
-        const html = response.data;
-        const $ = cheerio.load(html);
-        const categories = []
-        const excludes = ['bengali', 'read', 'ভিডিও', 'cxy7jg418e7t']
-        const ids = []
-        $('header nav div[data-e2e="dropdown-nav"] ul li a').each((index, element) => {
-             const title = $(element).text().trim()
-             let link = $(element).attr('href');
-             let id = link.split('/')
-             id = id[id.length-1]
-             ids.push(id)
-             if(!excludes.includes(id)) {
-                categories.push({id, title})
-             }
-        })
-
-        
-        $('section h2 a').each((index, element) => {
-            const title = $(element).text().trim()
-            let link = $(element).attr('href');
-            let id = link.split('/')
-            id = id[id.length-1]
-            if(!ids.includes(id)) {
-               categories.push({id, title})
-            }
-       })
-
-        res.status(200).json({
-            success: true,
-            count: categories.length,
-            categories
-        });
-    } catch (error) {
-        console.error('Error fetching popular news:', error.message);
-        res.status(500).json({
-            success: false,
-            error: error.message || 'Failed to fetch news categories.'
-        });
-    }
-})
-
-router.get('/api/news', async (req, res) => {
-    // console.log("news")
+const  getMainNews = async (req, res) => {
     try {
         const url = 'https://www.bbc.com/bengali';
         const response = await axios.get(url, {
@@ -147,10 +95,69 @@ router.get('/api/news', async (req, res) => {
             error: error.message || 'Failed to fetch news articles'
         });
     }
+}
+
+router.get('/api/categories', async(req, res) => {
+    try {
+        const url = 'https://www.bbc.com/bengali';
+        const response = await axios.get(url, {
+            timeout: 10000,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (compatible; NewsCrawler/1.0)'
+            }
+        });
+
+        const html = response.data;
+        const $ = cheerio.load(html);
+        const categories = [{id: "main", title: "মূলপাতা"}]
+        const excludes = ['bengali', 'read', 'ভিডিও', 'cxy7jg418e7t']
+        const ids = []
+        $('header nav div[data-e2e="dropdown-nav"] ul li a').each((index, element) => {
+             const title = $(element).text().trim()
+             let link = $(element).attr('href');
+             let id = link.split('/')
+             id = id[id.length-1]
+             ids.push(id)
+             if(!excludes.includes(id)) {
+                categories.push({id, title})
+             }
+        })
+
+        
+        $('section h2 a').each((index, element) => {
+            const title = $(element).text().trim()
+            let link = $(element).attr('href');
+            let id = link.split('/')
+            id = id[id.length-1]
+            if(!ids.includes(id)) {
+               categories.push({id, title})
+            }
+       })
+
+        res.status(200).json({
+            success: true,
+            count: categories.length,
+            categories,
+            scrapedAt: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('Error fetching popular news:', error.message);
+        res.status(500).json({
+            success: false,
+            error: error.message || 'Failed to fetch news categories.'
+        });
+    }
+})
+
+router.get('/api/news', async (req, res) => {
+    return await getMainNews(req, res)
 });
 
 router.get('/api/categories/:id', async (req, res) => {
     const categoryId = req.params.id;
+    if(categoryId === "main") {
+        return await getMainNews(req, res)
+    }
     const url = `https://www.bbc.com/bengali/topics/${categoryId}`;
 
     try {
@@ -357,7 +364,8 @@ router.get('/api/popular', async (req, res) => {
         res.json({
             success: true,
             count: popularArticles.length,
-            articles: popularArticles
+            articles: popularArticles,
+            scrapedAt: new Date().toISOString()
         });
 
     } catch (error) {

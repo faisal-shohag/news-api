@@ -64,6 +64,7 @@ bbc-bengali-scraper/
     "success": true,
     "count": 5,
     "categories": [
+      {"id": "main", "title": "মূলপাতা"},
       { "id": "c123abc", "title": "খেলা" },
       { "id": "c456def", "title": "বিজ্ঞান" }
     ]
