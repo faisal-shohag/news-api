@@ -7,6 +7,7 @@ const PORT = 3000;
 
 app.use(express.static('public'));
 const crawl = require('./crawl');
+const dummy = require('./dummy');
 
 app.use(cors());
 
@@ -43,6 +44,7 @@ app.get('/', (req, res) => {
 });
 
 app.use(crawl);
+app.use(dummy);
 
 app.listen(PORT, () => {
     console.log(`App is running on PORT ${PORT}!`);
