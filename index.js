@@ -12,32 +12,32 @@ const dummy = require('./dummy');
 app.use(cors());
 
 
-const globalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 mins
-    max: 300, 
-    message: {
-        success: false,
-        error: 'Too many requests from this IP, please try again after 15 minutes.'
-    },
-    standardHeaders: true, 
-    legacyHeaders: false, 
-});
+// const globalLimiter = rateLimit({
+//     windowMs: 15 * 60 * 1000, // 15 mins
+//     max: 300, 
+//     message: {
+//         success: false,
+//         error: 'Too many requests from this IP, please try again after 15 minutes.'
+//     },
+//     standardHeaders: true, 
+//     legacyHeaders: false, 
+// });
 
 
-app.use(globalLimiter);
+// app.use(globalLimiter);
 
-const apiLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 min
-    max: 15, 
-    message: {
-        success: false,
-        error: 'Too many API requests, please wait a minute and try again.'
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+// const apiLimiter = rateLimit({
+//     windowMs: 60 * 1000, // 1 min
+//     max: 15, 
+//     message: {
+//         success: false,
+//         error: 'Too many API requests, please wait a minute and try again.'
+//     },
+//     standardHeaders: true,
+//     legacyHeaders: false,
+// });
 
-app.use('/api', apiLimiter);
+// app.use('/api', apiLimiter);
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname + '/index.html'));
