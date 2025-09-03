@@ -172,7 +172,7 @@ router.get('/api/categories/:id', async (req, res) => {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (compatible; NewsCrawler/1.0)'
             }
-        });
+        }); 
 
         const html = response.data;
         const $ = cheerio.load(html);
