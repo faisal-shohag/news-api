@@ -1,7 +1,7 @@
 const cheerio = require('cheerio');
 const {Router }= require('express')
 const axios = require('axios');
-const { newsCat } = require('../utils/datamap');
+const { newsCat, bbcBn, catNews } = require('../utils/datamap');
 
 const router = Router()
 
@@ -87,8 +87,8 @@ const  getMainNews = async (req, res) => {
 
         res.json({
             success: true,
-            categoryId: "main",
-            categoryName: newsCat["main"],
+            categoryId: newsCat["main"].slug,
+            categoryName: newsCat["main"].title,
             count: newsArticles.length,
             articles: newsArticles
         });
@@ -125,7 +125,7 @@ router.get('/api/categories', async(req, res) => {
              id = id[id.length-1]
              ids.push(id)
              if(!excludes.includes(id)) {
-                categories.push({id, title})
+                categories.push({id: newsCat[id].slug, title})
              }
         })
 
@@ -136,7 +136,7 @@ router.get('/api/categories', async(req, res) => {
             let id = link.split('/')
             id = id[id.length-1]
             if(!ids.includes(id)) {
-               categories.push({id, title})
+               categories.push({id: newsCat[id].slug, title})
             }
        })
 
@@ -164,7 +164,7 @@ router.get('/api/categories/:id', async (req, res) => {
     if(categoryId === "main") {
         return await getMainNews(req, res)
     }
-    const url = `https://www.bbc.com/bengali/topics/${categoryId}`;
+    const url = `https://www.bbc.com/bengali/${bbcBn[categoryId]}`;
 
     try {
         const response = await axios.get(url, {
@@ -240,14 +240,23 @@ router.get('/api/categories/:id', async (req, res) => {
 
         res.json({
             success: true,
-            categoryId,
-            categoryName: newsCat[categoryId], 
+            categoryId: categoryId,
+            categoryName: catNews[categoryId].title, 
             count: articles.length,
             articles
         });
 
     } catch (error) {
         console.error('Error fetching article:', error.message);
+        if(error.response?.status === 404) {
+              return res.json({
+            success: true,
+            categoryId: categoryId,
+            categoryName: categoryId, 
+            count: 0,
+            articles:[]
+        });
+        }
         res.status(error.response?.status === 404 ? 404 : 500).json({
             success: false,
             error: error.message || 'Failed to fetch article'
