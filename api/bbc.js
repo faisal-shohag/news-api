@@ -66,7 +66,7 @@ const  getMainNews = async (req, res) => {
                     id,
                     title,
                     link,
-                    description: description || 'No description available',
+                    description: description,
                     time: timestamp,
                     image: {
                         alt: imgAlt,
