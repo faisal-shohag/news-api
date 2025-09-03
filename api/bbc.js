@@ -165,7 +165,7 @@ router.get('/api/categories/:id', async (req, res) => {
         return await getMainNews(req, res)
     }
     const url = `https://www.bbc.com/bengali/${bbcBn[categoryId]}`;
-
+ 
     try {
         const response = await axios.get(url, {
             timeout: 10000,

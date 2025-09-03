@@ -20,7 +20,7 @@ exports.newsCat = {
   "c2dwq2nd40xt": { title: "বাংলাদেশ", slug: "bangladesh" },
   "cdr56gv542vt": { title: "ভারত", slug: "india" }
 };
-
+ 
 exports.catNews = {
   "main": { title: "মূলপাতা", slug: "main" },
   "politics": { title: "রাজনীতি", slug: "cqywj91rkg6t" },
