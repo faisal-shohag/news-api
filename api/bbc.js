@@ -1,6 +1,7 @@
 const cheerio = require('cheerio');
 const {Router }= require('express')
 const axios = require('axios');
+const { newsCat } = require('../utils/datamap');
 
 const router = Router()
 
@@ -23,6 +24,7 @@ const  getMainNews = async (req, res) => {
             const titleElement = $(element).find('h3 a');
             const title = titleElement.text().trim();
             let link = titleElement.attr('href');
+            if(link) {
             let id = link.split('/')
             id = id[id.length-1]
             // Ensure full URL
@@ -73,6 +75,7 @@ const  getMainNews = async (req, res) => {
                     scrapedAt: new Date().toISOString()
                 });
             }
+        }
         });
 
         if (newsArticles.length === 0) {
@@ -84,11 +87,14 @@ const  getMainNews = async (req, res) => {
 
         res.json({
             success: true,
+            categoryId: "main",
+            categoryName: newsCat["main"],
             count: newsArticles.length,
             articles: newsArticles
         });
 
     } catch (error) {
+        console.log(error)
         console.error('Error fetching news:', error.message);
         res.status(500).json({
             success: false,
@@ -234,6 +240,8 @@ router.get('/api/categories/:id', async (req, res) => {
 
         res.json({
             success: true,
+            categoryId,
+            categoryName: newsCat[categoryId], 
             count: articles.length,
             articles
         });

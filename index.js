@@ -2,12 +2,12 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const cors = require('cors');
-const rateLimit = require('express-rate-limit'); // Add rate limiting package
+// const rateLimit = require('express-rate-limit'); // Add rate limiting package
 const PORT = 3000;
 
 app.use(express.static('public'));
-const crawl = require('./crawl');
-const dummy = require('./dummy');
+const crawl = require('./api/bbc.js');
+const dummy = require('./api/dummy.js');
 
 app.use(cors());
 
