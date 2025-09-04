@@ -155,9 +155,9 @@ router.get('/api/categories', async(req, res) => {
     }
 })
 
-router.get('/api/news', async (req, res) => {
-    return await getMainNews(req, res)
-});
+// router.get('/api/news', async (req, res) => {
+//     return await getMainNews(req, res)
+// });
 
 router.get('/api/categories/:id', async (req, res) => {
     const categoryId = req.params.id;
