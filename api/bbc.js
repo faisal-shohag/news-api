@@ -1,398 +1,405 @@
-const cheerio = require('cheerio');
-const {Router }= require('express')
-const axios = require('axios');
-const { newsCat, bbcBn, catNews } = require('../utils/datamap');
+const cheerio = require("cheerio");
+const { Router } = require("express");
+const axios = require("axios");
+const { newsCat, bbcBn, catNews } = require("../utils/datamap");
 
-const router = Router()
+const router = Router();
 
-const  getMainNews = async (req, res) => {
-    try {
-        const url = 'https://www.bbc.com/bengali';
-        const response = await axios.get(url, {
-            timeout: 10000,
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (compatible; NewsCrawler/1.0)'
-            }
-        });
-        
-        const html = response.data;
-        const $ = cheerio.load(html);
-        const newsArticles = [];
+const getMainNews = async (req, res) => {
+  try {
+    const url = "https://www.bbc.com/bengali";
+    const response = await axios.get(url, {
+      timeout: 10000,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; NewsCrawler/1.0)",
+      },
+    });
 
-        // Target the specific container and list items
-        $('main ul li').each((index, element) => {
-            const titleElement = $(element).find('h3 a');
-            const title = titleElement.text().trim();
-            let link = titleElement.attr('href');
-            if(link) {
-            let id = link.split('/')
-            id = id[id.length-1]
-            // Ensure full URL
-            link = link?.startsWith('http') ? link : `https://www.bbc.com${link}`;
-            
-            const description = $(element).find('p.promo-paragraph').text().trim();
-            const timestamp = $(element).find('time.promo-timestamp').text().trim();
-            
-            // Get image URL from the largest available size
-             // Extract image information
-             const imgElement = $(element).find('source');
-             const imgElement2 = $(element).find('img');
-             const imgSrc = imgElement2.attr('src');
-             const imgSrcset = imgElement.attr('srcset');
-             const imgAlt = imgElement2.attr('alt');
-             
-             // Parse srcset into array of objects with resolution and URL
-             let srcset = [];
-             if (imgSrcset) {
-                 srcset = imgSrcset.split(', ').map(item => {
-                     const [url, resolution] = item.split(' ');
-                     return {
-                         resolution,
-                         url
-                     };
-                 });
-             }
-             
-             // Add base image to srcset if it exists
-             if (imgSrc) {
-                 srcset.unshift({
-                     resolution: 'base',
-                     url: imgSrc
-                 });
-             }
+    const html = response.data;
+    const $ = cheerio.load(html);
+    const newsArticles = [];
 
-            if (title) {
-                newsArticles.push({
-                    id,
-                    title,
-                    link,
-                    description: description,
-                    time: timestamp,
-                    image: {
-                        alt: imgAlt,
-                        srcset: srcset
-                    },
-                    scrapedAt: new Date().toISOString()
-                });
-            }
-        }
-        });
+    // Target the specific container and list items
+    $("main ul li").each((index, element) => {
+      const titleElement = $(element).find("h3 a");
+      const title = titleElement.text().trim();
+      let link = titleElement.attr("href");
+      if (link) {
+        let id = link.split("/");
+        id = id[id.length - 1];
+        // Ensure full URL
+        link = link?.startsWith("http") ? link : `https://www.bbc.com${link}`;
 
-        if (newsArticles.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: 'No articles found'
-            });
+        const description = $(element).find("p.promo-paragraph").text().trim();
+        const timestamp = $(element).find("time.promo-timestamp").text().trim();
+
+        // Get image URL from the largest available size
+        // Extract image information
+        const imgElement = $(element).find("source");
+        const imgElement2 = $(element).find("img");
+        const imgSrc = imgElement2.attr("src");
+        const imgSrcset = imgElement.attr("srcset");
+        const imgAlt = imgElement2.attr("alt");
+
+        // Parse srcset into array of objects with resolution and URL
+        let srcset = [];
+        if (imgSrcset) {
+          srcset = imgSrcset.split(", ").map((item) => {
+            const [url, resolution] = item.split(" ");
+            return {
+              resolution,
+              url,
+            };
+          });
         }
 
-        res.json({
-            success: true,
-            categoryId: newsCat["main"].slug,
-            categoryName: newsCat["main"].title,
-            count: newsArticles.length,
-            articles: newsArticles
-        });
+        // Add base image to srcset if it exists
+        if (imgSrc) {
+          srcset.unshift({
+            resolution: "base",
+            url: imgSrc,
+          });
+        }
 
-    } catch (error) {
-        console.log(error)
-        console.error('Error fetching news:', error.message);
-        res.status(500).json({
-            success: false,
-            error: error.message || 'Failed to fetch news articles'
-        });
+        if (title) {
+          newsArticles.push({
+            id,
+            title,
+            link,
+            description: description,
+            time: timestamp,
+            image: {
+              alt: imgAlt,
+              srcset: srcset,
+            },
+            scrapedAt: new Date().toISOString(),
+          });
+        }
+      }
+    });
+
+    if (newsArticles.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No articles found",
+      });
     }
-}
 
-router.get('/api/categories', async(req, res) => {
-    try {
-        const url = 'https://www.bbc.com/bengali';
-        const response = await axios.get(url, {
-            timeout: 10000,
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (compatible; NewsCrawler/1.0)'
-            }
-        });
+    res.json({
+      success: true,
+      categoryId: newsCat["main"].slug,
+      categoryName: newsCat["main"].title,
+      count: newsArticles.length,
+      articles: newsArticles,
+    });
+  } catch (error) {
+    console.log(error);
+    console.error("Error fetching news:", error.message);
+    res.status(500).json({
+      success: false,
+      error: error.message || "Failed to fetch news articles",
+    });
+  }
+};
 
-        const html = response.data;
-        const $ = cheerio.load(html);
-        const categories = [{id: "main", title: "মূলপাতা"}]
-        const excludes = ['bengali', 'read', 'ভিডিও', 'cxy7jg418e7t']
-        const ids = []
-        $('header nav div[data-e2e="dropdown-nav"] ul li a').each((index, element) => {
-             const title = $(element).text().trim()
-             let link = $(element).attr('href');
-             let id = link.split('/')
-             id = id[id.length-1]
-             ids.push(id)
-             if(!excludes.includes(id)) {
-                categories.push({id: newsCat[id].slug, title})
-             }
-        })
+router.get("/api/categories", async (req, res) => {
+  try {
+    const url = "https://www.bbc.com/bengali";
+    const response = await axios.get(url, {
+      timeout: 10000,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; NewsCrawler/1.0)",
+      },
+    });
 
-        
-        $('section h2 a').each((index, element) => {
-            const title = $(element).text().trim()
-            let link = $(element).attr('href');
-            let id = link.split('/')
-            id = id[id.length-1]
-            if(!ids.includes(id)) {
-               categories.push({id: newsCat[id].slug, title})
-            }
-       })
+    const html = response.data;
+    const $ = cheerio.load(html);
+    const categories = [{ id: "main", title: "মূলপাতা" }];
+    const excludes = ["bengali", "read", "ভিডিও", "cxy7jg418e7t"];
+    const ids = [];
+    $('header nav div[data-e2e="dropdown-nav"] ul li a').each(
+      (index, element) => {
+        const title = $(element).text().trim();
+        let link = $(element).attr("href");
+        let id = link.split("/");
+        // console.log("link====", link)
+        id = id[id.length - 1];
+        ids.push(id);
+        //  console.log(ids)
+        //  console.log(newsCat)
 
-        res.status(200).json({
-            success: true,
-            count: categories.length,
-            categories,
-            scrapedAt: new Date().toISOString()
-        });
-    } catch (error) {
-        console.error('Error fetching popular news:', error.message);
-        res.status(500).json({
-            success: false,
-            error: error.message || 'Failed to fetch news categories.'
-        });
-    }
-})
+        //  console.log(newsCat)
+        if (!excludes.includes(id)) {
+          if (newsCat[id]) {
+            categories.push({ id: newsCat[id].slug, title });
+          }
+        }
+      }
+    );
+
+    $("section h2 a").each((index, element) => {
+      const title = $(element).text().trim();
+      let link = $(element).attr("href");
+      let id = link.split("/");
+      id = id[id.length - 1];
+      if (!ids.includes(id)) {
+        categories.push({ id: newsCat[id].slug, title });
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      count: categories.length,
+      categories,
+      scrapedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Error fetching news categories:", error.message);
+    res.status(500).json({
+      success: false,
+      error: error.message || "Failed to fetch news categories.",
+    });
+  }
+});
 
 // router.get('/api/news', async (req, res) => {
 //     return await getMainNews(req, res)
 // });
 
-router.get('/api/categories/:id', async (req, res) => {
-    const categoryId = req.params.id;
-    if(categoryId === "main") {
-        return await getMainNews(req, res)
-    }
-    const url = `https://www.bbc.com/bengali/${bbcBn[categoryId]}`;
- 
-    try {
-        const response = await axios.get(url, {
-            timeout: 10000,
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (compatible; NewsCrawler/1.0)'
-            }
-        }); 
+router.get("/api/categories/:id", async (req, res) => {
+  const categoryId = req.params.id;
+  if (categoryId === "main") {
+    return await getMainNews(req, res);
+  }
+  const url = `https://www.bbc.com/bengali/${bbcBn[categoryId]}`;
 
-        const html = response.data;
-        const $ = cheerio.load(html);
+  try {
+    const response = await axios.get(url, {
+      timeout: 10000,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; NewsCrawler/1.0)",
+      },
+    });
 
-        // Find the curation grid container
-        const gridContainer = $('div[data-testid="curation-grid-normal"]');
-        
-        // Initialize array to store extracted items
-        const articles = [];
+    // console.log(categoryId)
 
-        // Iterate through each list item in the grid
-        gridContainer.find('li.bbc-t44f9r').each((index, element) => {
-            const article = $(element);
-            
-            // Extract title and link
-            const titleElement = article.find('h2 a');
-            const title = titleElement.text().trim();
-            const link = titleElement.attr('href');
-            let id = link.split('/')
-            id = id[id.length-1]
-            
-            // Extract time
-            const time = article.find('time.promo-timestamp').text().trim();
-            const datetime = article.find('time.promo-timestamp').attr('datetime');
-            
-            // Extract image information
-            const imgElement = article.find('img');
-            const imgSrc = imgElement.attr('src');
-            const imgSrcset = imgElement.attr('srcset');
-            const imgAlt = imgElement.attr('alt');
-            
-            // Parse srcset into array of objects with resolution and URL
-            let srcset = [];
-            if (imgSrcset) {
-                srcset = imgSrcset.split(', ').map(item => {
-                    const [url, resolution] = item.split(' ');
-                    return {
-                        resolution,
-                        url
-                    };
-                });
-            }
-            
-            // Add base image to srcset if it exists
-            if (imgSrc) {
-                srcset.unshift({
-                    resolution: 'base',
-                    url: imgSrc
-                });
-            }
-            
-            // Push extracted data to articles array
-            articles.push({
-                id,
-                title,
-                link,
-                time,
-                datetime,
-                image: {
-                    alt: imgAlt,
-                    srcset: srcset
-                }
-            });
-        });
+    const html = response.data;
+    const $ = cheerio.load(html);
 
-        res.json({
-            success: true,
-            categoryId: categoryId,
-            categoryName: catNews[categoryId].title, 
-            count: articles.length,
-            articles
-        });
+    // Find the curation grid container
+    const gridContainer = $('div[data-testid="curation-grid-normal"]');
 
-    } catch (error) {
-        console.error('Error fetching article:', error.message);
-        if(error.response?.status === 404) {
-              return res.json({
-            success: true,
-            categoryId: categoryId,
-            categoryName: categoryId, 
-            count: 0,
-            articles:[]
-        });
-        }
-        res.status(error.response?.status === 404 ? 404 : 500).json({
-            success: false,
-            error: error.message || 'Failed to fetch article'
-        });
-    }
-});
+    // Initialize array to store extracted items
+    const articles = [];
 
-router.get('/api/news/:id', async (req, res) => {
-    const articleId = req.params.id;
-    const url = articleId.includes('news') ? `https://www.bbc.com/bengali/${articleId}` : `https://www.bbc.com/bengali/articles/${articleId}`
+    // Iterate through each list item in the grid
+    gridContainer.find("li.bbc-psvf5b").each((index, element) => {
+      const article = $(element);
 
-    try {
-        const response = await axios.get(url, {
-            timeout: 10000,
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (compatible; NewsCrawler/1.0)'
-            }
-        });
+      // Extract title and link
+      const titleElement = article.find("h2 a");
+      const title = titleElement.text().trim();
+      const link = titleElement.attr("href");
+      let id = link.split("/");
+      id = id[id.length - 1];
 
-        const html = response.data;
-        const $ = cheerio.load(html);
-        
-        // Extract title using h1 within main
-        const title = $('main h1').text().trim();
-        
-        if (!title) {
-            return res.status(404).json({
-                success: false,
-                message: 'Article not found'
-            });
-        }
+      // Extract time
+      const time = article.find("time.promo-timestamp").text().trim();
+      const datetime = article.find("time.promo-timestamp").attr("datetime");
 
-        // Extract timestamp (first time element in div with dir="ltr")
-        const timestamp = $('main div[dir="ltr"] time').first().text().trim();
+      // Extract image information
+      const imgElement = article.find("img");
+      const imgSrc = imgElement.attr("src");
+      const imgSrcset = imgElement.attr("srcset");
+      const imgAlt = imgElement.attr("alt");
 
-        // Extract content (all p elements in div with dir="ltr" within main)
-        const content = [];
-        $('main div[dir="ltr"] p').each((index, element) => {
-            const text = $(element).text().trim();
-            if (text) content.push(text);
-        });
-
-        // Extract images (all img within figure in main)
-        const images = [];
-        $('main figure img').each((index, element) => {
-            const imageUrl = $(element).attr('src');
-            // Caption is in the next p element after img within figure
-            const caption = $(element).parent().next('p').text().trim();
-            
-            images.push({
-                url: imageUrl,
-                caption: caption || 'No caption available'
-            });
-        });
-
-        // Article object
-        const article = {
-            id: articleId,
-            title,
+      // Parse srcset into array of objects with resolution and URL
+      let srcset = [];
+      if (imgSrcset) {
+        srcset = imgSrcset.split(", ").map((item) => {
+          const [url, resolution] = item.split(" ");
+          return {
+            resolution,
             url,
-            timestamp,
-            content,
-            images,
-            scrapedAt: new Date().toISOString()
-        };
-
-        res.json({
-            success: true,
-            article
+          };
         });
+      }
 
-    } catch (error) {
-        console.error('Error fetching article:', error.message);
-        res.status(error.response?.status === 404 ? 404 : 500).json({
-            success: false,
-            error: error.message || 'Failed to fetch article'
+      // Add base image to srcset if it exists
+      if (imgSrc) {
+        srcset.unshift({
+          resolution: "base",
+          url: imgSrc,
         });
+      }
+
+      // Push extracted data to articles array
+      articles.push({
+        id,
+        title,
+        link,
+        time,
+        datetime,
+        image: {
+          alt: imgAlt,
+          srcset: srcset,
+        },
+      });
+    });
+
+    res.json({
+      success: true,
+      categoryId: categoryId,
+      categoryName: catNews[categoryId].title,
+      count: articles.length,
+      articles,
+    });
+  } catch (error) {
+    console.error("Error fetching article:", error.message);
+    if (error.response?.status === 404) {
+      return res.json({
+        success: true,
+        categoryId: categoryId,
+        categoryName: categoryId,
+        count: 0,
+        articles: [],
+      });
     }
+    res.status(error.response?.status === 404 ? 404 : 500).json({
+      success: false,
+      error: error.message || "Failed to fetch article",
+    });
+  }
 });
 
-router.get('/api/popular', async (req, res) => {
-    try {
-        const url = 'https://www.bbc.com/bengali/popular/read';
-        const response = await axios.get(url, {
-            timeout: 10000,
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (compatible; NewsCrawler/1.0)'
-            }
-        });
+router.get("/api/news/:id", async (req, res) => {
+  const articleId = req.params.id;
+  const url = articleId.includes("news")
+    ? `https://www.bbc.com/bengali/${articleId}`
+    : `https://www.bbc.com/bengali/articles/${articleId}`;
 
-        const html = response.data;
-        const $ = cheerio.load(html);
-        const popularArticles = [];
+  try {
+    const response = await axios.get(url, {
+      timeout: 10000,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; NewsCrawler/1.0)",
+      },
+    });
 
-        // Using only main, ol, and a tags
-        $('main ol a').each((index, element) => {
-            const title = $(element).text().trim();
-            let link = $(element).attr('href');
-            const rank = index + 1; // Assuming rank is the order in the list
-            let id = link.split('/')
-            id = id[id.length-1]
-            link = link?.startsWith('http') ? link : `https://www.bbc.com${link}`;
+    const html = response.data;
+    const $ = cheerio.load(html);
 
-            if (title) {
-                popularArticles.push({
-                    rank,
-                    id,
-                    title,
-                    link,
-                    scrapedAt: new Date().toISOString()
-                });
-            }
-        });
+    // Extract title using h1 within main
+    const title = $("main h1").text().trim();
 
-        if (popularArticles.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: 'No popular articles found'
-            });
-        }
-
-        res.json({
-            success: true,
-            count: popularArticles.length,
-            articles: popularArticles,
-            scrapedAt: new Date().toISOString()
-        });
-
-    } catch (error) {
-        console.error('Error fetching popular news:', error.message);
-        res.status(500).json({
-            success: false,
-            error: error.message || 'Failed to fetch popular news articles'
-        });
+    if (!title) {
+      return res.status(404).json({
+        success: false,
+        message: "Article not found",
+      });
     }
+
+    // Extract timestamp (first time element in div with dir="ltr")
+    const timestamp = $('main div[dir="ltr"] time').first().text().trim();
+
+    // Extract content (all p elements in div with dir="ltr" within main)
+    const content = [];
+    $('main div[dir="ltr"] p').each((index, element) => {
+      const text = $(element).text().trim();
+      if (text) content.push(text);
+    });
+
+    // Extract images (all img within figure in main)
+    const images = [];
+    $("main figure img").each((index, element) => {
+      const imageUrl = $(element).attr("src");
+      // Caption is in the next p element after img within figure
+      const caption = $(element).parent().next("p").text().trim();
+
+      images.push({
+        url: imageUrl,
+        caption: caption || "No caption available",
+      });
+    });
+
+    // Article object
+    const article = {
+      id: articleId,
+      title,
+      url,
+      timestamp,
+      content,
+      images,
+      scrapedAt: new Date().toISOString(),
+    };
+
+    res.json({
+      success: true,
+      article,
+    });
+  } catch (error) {
+    console.error("Error fetching article:", error.message);
+    res.status(error.response?.status === 404 ? 404 : 500).json({
+      success: false,
+      error: error.message || "Failed to fetch article",
+    });
+  }
 });
 
+router.get("/api/popular", async (req, res) => {
+  try {
+    const url = "https://www.bbc.com/bengali/popular/read";
+    const response = await axios.get(url, {
+      timeout: 10000,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; NewsCrawler/1.0)",
+      },
+    });
 
-module.exports = router
+    const html = response.data;
+    const $ = cheerio.load(html);
+    const popularArticles = [];
+
+    // Using only main, ol, and a tags
+    $("main ol a").each((index, element) => {
+      const title = $(element).text().trim();
+      let link = $(element).attr("href");
+      const rank = index + 1; // Assuming rank is the order in the list
+      let id = link.split("/");
+      id = id[id.length - 1];
+      link = link?.startsWith("http") ? link : `https://www.bbc.com${link}`;
+
+      if (title) {
+        popularArticles.push({
+          rank,
+          id,
+          title,
+          link,
+          scrapedAt: new Date().toISOString(),
+        });
+      }
+    });
+
+    if (popularArticles.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No popular articles found",
+      });
+    }
+
+    res.json({
+      success: true,
+      count: popularArticles.length,
+      articles: popularArticles,
+      scrapedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Error fetching popular news:", error.message);
+    res.status(500).json({
+      success: false,
+      error: error.message || "Failed to fetch popular news articles",
+    });
+  }
+});
+
+module.exports = router;
