@@ -130,8 +130,9 @@ router.get("/api/categories", async (req, res) => {
 
         //  console.log(newsCat)
         if (!excludes.includes(id)) {
-          if (newsCat[id]) {
-            categories.push({ id: newsCat[id].slug, title });
+          // console.log({id, newsCat: newsCat[id]});
+          if (newsCat[id] && newsCat[id]?.slug) {
+            categories.push({ id: newsCat[id]?.slug, title });
           }
         }
       }
@@ -142,8 +143,8 @@ router.get("/api/categories", async (req, res) => {
       let link = $(element).attr("href");
       let id = link.split("/");
       id = id[id.length - 1];
-      if (!ids.includes(id)) {
-        categories.push({ id: newsCat[id].slug, title });
+      if (!ids.includes(id) && newsCat[id]?.slug) {
+        categories.push({ id: newsCat[id]?.slug, title });
       }
     });
 
@@ -193,7 +194,7 @@ router.get("/api/categories/:id", async (req, res) => {
     const articles = [];
 
     // Iterate through each list item in the grid
-    gridContainer.find("li.bbc-psvf5b").each((index, element) => {
+    gridContainer.find("li").each((index, element) => {
       const article = $(element);
 
       // Extract title and link
