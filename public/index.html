@@ -150,6 +150,115 @@
         Much more coming soon...
     </div> -->
 
+<div class="mt-2 bg-white w-full p-3 rounded-xl shadow-lg bg-clip-padding bg-opacity-60 border border-gray-200 backdrop:blur-3xl">
+        <div class="flex items-baseline gap-2">
+            <span class="font-black text-lg">API v2</span>
+            <span class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">recommended</span>
+        </div>
+        <div class="text-sm text-gray-500 mt-1">
+            Reads the JSON payload BBC's own frontend uses instead of scraping the rendered page,
+            so it survives markup changes and returns real timestamps, summaries, bylines, topics and tags.
+            The <span class="font-mono">/api</span> routes above are unchanged and still work.
+        </div>
+        <hr class="mt-2"/>
+        <div class="mt-3">
+            <div class="font-bold">Latest headlines</div>
+            <div class="text-sm text-gray-500">Whole homepage, flattened and deduped. Supports limit, offset, category, q.</div>
+            <div class="mt-2 lg:flex lg:items-center gap-3">
+                <div class="font-mono bg-gray-100 px-2 rounded-lg py-1 break-all">/api/v2/news?limit=10</div>
+                <a class="font-bold underline text-red-600" target="_blank" href="/api/v2/news?limit=10">Go</a>
+            </div>
+        </div>
+        <div class="mt-3">
+            <div class="font-bold">Homepage sections</div>
+            <div class="text-sm text-gray-500">Grouped the way BBC curates the page.</div>
+            <div class="mt-2 lg:flex lg:items-center gap-3">
+                <div class="font-mono bg-gray-100 px-2 rounded-lg py-1 break-all">/api/v2/news/sections</div>
+                <a class="font-bold underline text-red-600" target="_blank" href="/api/v2/news/sections">Go</a>
+            </div>
+        </div>
+        <div class="mt-3">
+            <div class="font-bold">Lead stories</div>
+            
+            <div class="mt-2 lg:flex lg:items-center gap-3">
+                <div class="font-mono bg-gray-100 px-2 rounded-lg py-1 break-all">/api/v2/news/latest?limit=5</div>
+                <a class="font-bold underline text-red-600" target="_blank" href="/api/v2/news/latest?limit=5">Go</a>
+            </div>
+        </div>
+        <div class="mt-3">
+            <div class="font-bold">Most read</div>
+            <div class="text-sm text-gray-500">Ranked.</div>
+            <div class="mt-2 lg:flex lg:items-center gap-3">
+                <div class="font-mono bg-gray-100 px-2 rounded-lg py-1 break-all">/api/v2/news/most-read</div>
+                <a class="font-bold underline text-red-600" target="_blank" href="/api/v2/news/most-read">Go</a>
+            </div>
+        </div>
+        <div class="mt-3">
+            <div class="font-bold">Categories</div>
+            <div class="text-sm text-gray-500">Straight from the site nav.</div>
+            <div class="mt-2 lg:flex lg:items-center gap-3">
+                <div class="font-mono bg-gray-100 px-2 rounded-lg py-1 break-all">/api/v2/categories</div>
+                <a class="font-bold underline text-red-600" target="_blank" href="/api/v2/categories">Go</a>
+            </div>
+        </div>
+        <div class="mt-3">
+            <div class="font-bold">One category</div>
+            <div class="text-sm text-gray-500">Accepts a slug, the Bengali title, or a raw BBC topic id.</div>
+            <div class="mt-2 lg:flex lg:items-center gap-3">
+                <div class="font-mono bg-gray-100 px-2 rounded-lg py-1 break-all">/api/v2/category/technology?page=1</div>
+                <a class="font-bold underline text-red-600" target="_blank" href="/api/v2/category/technology?page=1">Go</a>
+            </div>
+        </div>
+        <div class="mt-3">
+            <div class="font-bold">Deep crawl</div>
+            <div class="text-sm text-gray-500">Pages 1..n in one call. Rate limited separately because it is expensive.</div>
+            <div class="mt-2 lg:flex lg:items-center gap-3">
+                <div class="font-mono bg-gray-100 px-2 rounded-lg py-1 break-all">/api/v2/category/technology/all?pages=3</div>
+                <a class="font-bold underline text-red-600" target="_blank" href="/api/v2/category/technology/all?pages=3">Go</a>
+            </div>
+        </div>
+        <div class="mt-3">
+            <div class="font-bold">Full article</div>
+            <div class="text-sm text-gray-500">Structured body blocks, byline, topics, tags, word count.</div>
+            <div class="mt-2 lg:flex lg:items-center gap-3">
+                <div class="font-mono bg-gray-100 px-2 rounded-lg py-1 break-all">/api/v2/article/crerx7dlz7xo</div>
+                <a class="font-bold underline text-red-600" target="_blank" href="/api/v2/article/crerx7dlz7xo">Go</a>
+            </div>
+        </div>
+        <div class="mt-3">
+            <div class="font-bold">Related articles</div>
+            
+            <div class="mt-2 lg:flex lg:items-center gap-3">
+                <div class="font-mono bg-gray-100 px-2 rounded-lg py-1 break-all">/api/v2/article/crerx7dlz7xo/related?limit=5</div>
+                <a class="font-bold underline text-red-600" target="_blank" href="/api/v2/article/crerx7dlz7xo/related?limit=5">Go</a>
+            </div>
+        </div>
+        <div class="mt-3">
+            <div class="font-bold">Search</div>
+            <div class="text-sm text-gray-500">Ranked, over everything scraped so far. BBC search is never proxied.</div>
+            <div class="mt-2 lg:flex lg:items-center gap-3">
+                <div class="font-mono bg-gray-100 px-2 rounded-lg py-1 break-all">/api/v2/search?q=%E0%A6%9F%E0%A7%8D%E0%A6%B0%E0%A6%BE%E0%A6%AE%E0%A7%8D%E0%A6%AA</div>
+                <a class="font-bold underline text-red-600" target="_blank" href="/api/v2/search?q=%E0%A6%9F%E0%A7%8D%E0%A6%B0%E0%A6%BE%E0%A6%AE%E0%A7%8D%E0%A6%AA">Go</a>
+            </div>
+        </div>
+        <div class="mt-3">
+            <div class="font-bold">RSS feed</div>
+            <div class="text-sm text-gray-500">Also takes ?category=.</div>
+            <div class="mt-2 lg:flex lg:items-center gap-3">
+                <div class="font-mono bg-gray-100 px-2 rounded-lg py-1 break-all">/api/v2/feed.xml?limit=20</div>
+                <a class="font-bold underline text-red-600" target="_blank" href="/api/v2/feed.xml?limit=20">Go</a>
+            </div>
+        </div>
+        <div class="mt-3">
+            <div class="font-bold">Health</div>
+            <div class="text-sm text-gray-500">Uptime, upstream fetch count, cache stats.</div>
+            <div class="mt-2 lg:flex lg:items-center gap-3">
+                <div class="font-mono bg-gray-100 px-2 rounded-lg py-1 break-all">/api/v2/health</div>
+                <a class="font-bold underline text-red-600" target="_blank" href="/api/v2/health">Go</a>
+            </div>
+        </div>
+    </div>
+
     <div class="mt-2 bg-white w-full p-3 rounded-xl flex justify-center items-center gap-5 bg-clip-padding bg-opacity-60 border border-gray-200 backdrop:blur-3xl">
         <div>
            <a target="_blank" href="https://github.com/faisal-shohag/news-api"> <img class="h-8 w-8" src="https://cdn-icons-png.flaticon.com/512/2175/2175377.png"></a>
