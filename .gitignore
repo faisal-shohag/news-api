@@ -128,3 +128,8 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+# Editor-local settings
+.vscode/
+
+# Build output
+dist/
